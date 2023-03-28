@@ -1,4 +1,4 @@
-This repo helps you crawl the massive amount of google images from the web. There are three arguments that you should pass, which are as follows:
+<h2> This repo helps you crawl the massive amount of google images from the web. There are three arguments that you should pass, which are as follows: </h2>
 
 1. The Keyword that you expect to search for
 
