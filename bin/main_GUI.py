@@ -1,6 +1,7 @@
 
 import sys
 import os
+import re
   
 from PyQt5.QtWidgets import *
 from PyQt5 import QtCore
@@ -111,13 +112,24 @@ class GcrawlerUI(QDialog):
         self.save_file_init_dir_path = self.save_file_line_edit.text()
 
     def accept(self):        
+        if self.search_line_edit.text().strip() == '':
+            QMessageBox.warning(self, "경고 메세지", "찾을 이미지 검색어를 입력해주세요!")
+            return
+        if self.max_word_line_edit.text().strip() == '':
+            QMessageBox.warning(self, "경고 메세지", "다운로드 받을 이미지 개수를 입력해주세요!")
+            return
+        if self.save_file_line_edit.text().strip() == '':
+            QMessageBox.warning(self, "경고 메세지", "다운받을 디렉토리 경로를 설정해주세요!")
+            return
+        if  re.findall(r'\d+', self.max_word_line_edit.text().strip()) == []:
+            QMessageBox.warning(self, "경고 메세지", "다운받을 이미지 개수에 정수값을 입력해주세요!")
+            return
         self.time_worker.start()
         self.is_accepted = True
         # crawler_thread를 시작해준다.
         self.crawler_thread.start()
 
     def close(self):
-        self.time_worker.stop()
         self.is_accepted = False
         # crawler_thread가 종료될때 까지 기다려준다.
         self.crawler_thread.join()

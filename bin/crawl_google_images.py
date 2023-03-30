@@ -37,13 +37,17 @@ class GCrawler():
     # 검색어를 검색창에 입력하고 찾기
     def load_searching_item(self, search_key):
         self.search_bar = self.driver.find_element(By.XPATH, '/html/body/div[1]/div[3]/form/div[1]/div[1]/div[1]/div/div[2]/input')
+        for key in search_key.split():
+                if ':' in key:
+                    search_key = ' '.join(e for e in search_key.split()[1:])
         self.search_bar.send_keys(search_key)
         self.search_bar.send_keys(Keys.ENTER)
         self.driver.implicitly_wait(time_to_wait=5)
     
     # 찾는 개수중에서 숫자만 parsing해오기
     def validate_num_images(self, num):
-        self.valid_num =  re.findall(r'\d+', num)[0]
+        self.valid_num = re.findall(r'\d+', num)[0]
+      
     
     # n번 만큼 전체 페이지 스크롤 내리기
     def scroll_down_body_page(self, n):
@@ -98,8 +102,8 @@ class GCrawler():
     def run(self):
         self.set_init_driver(webdriver.ChromeOptions())
         self.load_searching_page()
-        self.load_searching_item(self.parent.search_line_edit.text())
-        self.validate_num_images(self.parent.max_word_line_edit.text())
+        self.load_searching_item(self.parent.search_line_edit.text().strip())
+        self.validate_num_images(self.parent.max_word_line_edit.text().strip())
         self.scroll_down_body_page(10)
         self.click_each_image_and_download_all(self.parent.search_line_edit.text(), self.parent.save_file_line_edit.text(),self.parent.max_word_line_edit.text())
         self.print_valid_num_imgs()
