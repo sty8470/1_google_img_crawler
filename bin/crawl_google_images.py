@@ -22,6 +22,7 @@ class GCrawler():
         self.high_images = None
         self.real_image = None
         self.valid_num = None
+        self.search_key = None
     
     # 초기 드라이버 세팅하기
     def set_init_driver(self, chrome_options):
@@ -36,11 +37,12 @@ class GCrawler():
         
     # 검색어를 검색창에 입력하고 찾기
     def load_searching_item(self, search_key):
+        self.search_key = search_key
         self.search_bar = self.driver.find_element(By.XPATH, '/html/body/div[1]/div[3]/form/div[1]/div[1]/div[1]/div/div[2]/input')
-        for key in search_key.split():
+        for key in self.search_key.split():
                 if ':' in key:
-                    search_key = ' '.join(e for e in search_key.split()[1:])
-        self.search_bar.send_keys(search_key)
+                    self.search_key = ' '.join(e for e in self.search_key.split()[1:])
+        self.search_bar.send_keys(self.search_key)
         self.search_bar.send_keys(Keys.ENTER)
         self.driver.implicitly_wait(time_to_wait=5)
     
@@ -61,7 +63,7 @@ class GCrawler():
         return time.sleep(random.uniform(0.3, 0.7))
     
     # 검색 된 사진 한장 한장 클릭하면서 HD 이미지 다운로드 하기
-    def click_each_image_and_download_all(self, search_key, save_path, max_count):
+    def click_each_image_and_download_all(self, save_path, max_count):
         self.images = self.driver.find_elements(By.XPATH, '//*[@id="islrg"]/div/div/a[1]/div[1]/img')
         for image in self.images:
             if not self.parent.is_accepted:
@@ -74,7 +76,7 @@ class GCrawler():
                 self.real_image = self.high_images[0].get_attribute('src')
                 
                 try:
-                    urllib.request.urlretrieve(self.real_image, '{}'.format(save_path+'/'+search_key) + str(self.valid_img_count) +'.jpg')
+                    urllib.request.urlretrieve(self.real_image, '{}'.format(save_path+'/'+self.search_key) + str(self.valid_img_count) +'.jpg')
                     self.valid_img_count += 1
                     if self.valid_img_count == 1:
                         print('Succeessfully download the {}st image!'.format(self.valid_img_count))
@@ -105,7 +107,7 @@ class GCrawler():
         self.load_searching_item(self.parent.search_line_edit.text().strip())
         self.validate_num_images(self.parent.max_word_line_edit.text().strip())
         self.scroll_down_body_page(10)
-        self.click_each_image_and_download_all(self.parent.search_line_edit.text(), self.parent.save_file_line_edit.text(),self.parent.max_word_line_edit.text())
+        self.click_each_image_and_download_all(self.parent.save_file_line_edit.text(),self.parent.max_word_line_edit.text())
         self.print_valid_num_imgs()
         self.print_invalid_num_imgs()
         self.parent.time_worker.working = False
